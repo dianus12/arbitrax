@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ArbitraX PRO</title>
+  <style>
+    :root {
+      --bg: #0b1320;
+      --card-bg: #141f32;
+      --card-border: #1f2f4a;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-blue: #38bdf8;
+      --accent-gold: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding-bottom: 110px;
+    }
+
+    header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: #1e3a5f;
+      color: var(--accent-blue);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .badge-pro {
+      font-size: 0.65rem;
+      background: #0284c7;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-view {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-view.active {
+      display: flex;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    /* Pestaña 1 - Panel de Inicio */
+    .hero-card {
+      background: linear-gradient(145deg, #16243b, #0f1a2c);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .hero-substats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-open-calc {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-open-calc:active {
+      transform: scale(0.98);
+    }
+
+    /* Modal Emergente de Arbitraje */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #111a2c;
+      width: 100%;
+      max-width: 550px;
+      border-radius: 22px 22px 0 0;
+      padding: 22px 18px 35px 18px;
+      max-height: 92vh;
+      overflow-y: auto;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 11px 12px;
+      background: #1a283f;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .calc-box {
+      background: #080f1a;
+      border: 1px solid #1a2a44;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 14px 0;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .calc-row.profit {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-green);
+      border-top: 1px dashed var(--card-border);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-save-op {
+      width: 100%;
+      padding: 14px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Pestaña 2: Bancos y Cuentas Editables */
+    .bank-block {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .bank-top {
+      padding: 14px 16px;
+      background: #19273f;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .acc-card {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .acc-card:last-child {
+      border-bottom: none;
+    }
+
+    .acc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .acc-name-txt {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .acc-inputs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 90px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .mini-input-group label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .mini-input {
+      width: 100%;
+      padding: 8px;
+      background: #0b1320;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .toggle-box {
+      display: flex;
+      background: #0b1320;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      height: 36px;
+      margin-top: 15px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .toggle-btn.yes.active {
+      background: var(--accent-green);
+      color: white;
+    }
+
+    .toggle-btn.no.active {
+      background: #334155;
+      color: white;
+    }
+
+    /* Pestaña 3: Pagos */
+    .pay-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Barra Inferior */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 75px;
+      background: #0b1320;
+      border-top: 1px solid var(--card-border);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      padding-bottom: env(safe-area-inset-bottom, 10px);
+      z-index: 90;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      height: 100%;
+      justify-content: center;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-blue);
+    }
+
+    .nav-icon {
+      font-size: 1.35rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecera -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <div class="brand-text">
+        <h1>ArbitraX <span class="badge-pro">BANCARIO</span></h1>
+      </div>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted);" id="currentDayTxt">Hoy</div>
+  </header>
+
+  <div class="container">
+
+    <!-- ==================== PESTAÑA 1: INICIO ==================== -->
+    <div id="tab-inicio" class="tab-view active">
+      <div class="hero-card">
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Ganancia Neta Acumulada Hoy</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-green); margin: 6px 0;" id="heroProfitHoy">+$0.00 <span style="font-size: 1rem; color: var(--text-muted);">USDT</span></div>
+        <div class="hero-substats">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Compras Realizadas Hoy</div>
+            <div style="font-size: 1.1rem; font-weight: 700;" id="heroOpsHoy">0 ops</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Total Comprado Banco</div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-blue);" id="heroUsdTotalHoy">$0 USD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón que abre la Calculadora Emergente -->
+      <button class="btn-open-calc" onclick="openModal('modalCalculadora')">
+        <span style="font-size: 1.3rem;">⚡</span>
+        Nueva Compra / Arbitraje
+      </button>
+
+      <!-- Historial de Hoy -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Operaciones Asentadas Hoy</h2>
+          <span style="font-size: 0.75rem; color: var(--text-muted);" onclick="limpiarHistorialHoy()">Limpiar</span>
+        </div>
+        <div id="listaOpsHoy" style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">Sin operaciones hoy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 2: BANCOS Y CUENTAS ==================== -->
+    <div id="tab-bancos" class="tab-view">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Control de compras y pagos diarios</span>
+        <button onclick="openModal('modalNuevaCuenta')" style="background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">+ Añadir Cuenta</button>
+      </div>
+
+      <div id="contenedorBancos">
+        <!-- Render dinámico de bancos con cuentas editables -->
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 3: PAGOS VIERNES ==================== -->
+    <div id="tab-pagos" class="tab-view">
+      <div class="card" style="background: linear-gradient(145deg, #16243b, #0f1a2c);">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Total a Pagar este Viernes</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-gold);" id="txtTotalSemanaPagar">$0.00 USD</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Compras de la Semana</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent-blue);" id="txtTotalSemanaCompras">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Desglose por Titular</h2>
+          <span style="font-size: 0.75rem; color: var(--accent-blue);">Lunes a Viernes</span>
+        </div>
+        <div id="listaTitularesPagos" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Render liquidación de cada persona -->
+        </div>
+
+        <button onclick="cerrarSemana()" style="width: 100%; padding: 14px; background: #059669; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 0.95rem; margin-top: 15px; cursor: pointer;">
+          ✅ Liquidar y Cerrar Semana (Viernes)
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== VENTANA EMERGENTE (CALCULADORA) ==================== -->
+  <div class="modal" id="modalCalculadora">
+    <div class="modal-content">
+      <div class="card-header">
+        <h2>⚡ Arbitraje / Intervención</h2>
+        <span onclick="closeModal('modalCalculadora')" style="cursor: pointer; font-size: 1.6rem; color: var(--text-muted);">&times;</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monto USD a Comprar en Banco</label>
+          <input type="number" id="calcUsdMeta" class="form-input" value="500" step="any" oninput="calcularOperacion()">
+        </div>
+        <div class="form-group">
+          <label>Tasa BCV Oficial (Bs/USD)</label>
+          <input type="number" id="calcTasaBCV" class="form-input" value="881.06" step="any" oninput="calcularOperacion()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tasa Venta P2P Binance (Bs/USDT)</label>
+          <input type="number" id="calcTasaP2P" class="form-input" value="1010.00" step="any" oninput="calcularOperacion()">
+        </div>
+        <div class="form-group">
+          <label>Recepción de Bolívares</label>
+          <select id="calcTipoRecepcion" class="form-select" onchange="calcularOperacion()">
+            <option value="0">Mismo Banco (0%)</option>
+            <option value="0.003">Otro Banco (+0.30% Interbancario)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fee Pasarela Binance (%)</label>
+          <input type="number" id="calcFeeBinance" class="form-input" value="4.10" step="any" oninput="calcularOperacion()">
+        </div>
+        <div class="form-group">
+          <label>Fee Tarjeta Int. (%)</label>
+          <input type="number" id="calcFeeTarjeta" class="form-input" value="2.45" step="any" oninput="calcularOperacion()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pago Titular / Mula (USD)</label>
+          <input type="number" id="calcPagoMula" class="form-input" value="5.00" step="any" oninput="calcularOperacion()">
+        </div>
+        <div class="form-group">
+          <label>Pago Bot / Sistema (USD)</label>
+          <input type="number" id="calcPagoBot" class="form-input" value="5.00" step="any" oninput="calcularOperacion()">
+        </div>
+      </div>
+
+      <!-- Resumen en Vivo -->
+      <div class="calc-box">
+        <div class="calc-row">
+          <span>Bs Requeridos (con 0.5% intervención):</span>
+          <span id="resBsTotales" style="font-weight: 600;">0.00 Bs</span>
+        </div>
+        <div class="calc-row">
+          <span>USDT que debes vender en Binance:</span>
+          <span id="resUsdtVender" style="color: var(--accent-gold); font-weight: bold;">0.00 USDT</span>
+        </div>
+        <div class="calc-row">
+          <span>USDT retornados (post-comisiones):</span>
+          <span id="resUsdtNetos">0.00 USDT</span>
+        </div>
+        <div class="calc-row">
+          <span>Gastos operativos deducidos:</span>
+          <span id="resGastosFijos" style="color: var(--accent-red);">-$10.00 USD</span>
+        </div>
+        <div class="calc-row profit">
+          <span>Ganancia Neta Limpia:</span>
+          <span id="resGananciaNeta">+$0.00 USDT</span>
+        </div>
+      </div>
+
+      <button class="btn-save-op" onclick="guardarOperacion()">Guardar y Asentar Operación</button>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Cuenta Nueva -->
+  <div class="modal" id="modalNuevaCuenta">
+    <div class="modal-content">
+      <div class="card-header">
+        <h2>Añadir Cuenta</h2>
+        <span onclick="closeModal('modalNuevaCuenta')" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Banco</label>
+        <select id="newAccBanco" class="form-select">
+          <option value="Banco de Venezuela">Banco de Venezuela</option>
+          <option value="Banesco">Banesco</option>
+          <option value="Mercantil">Mercantil</option>
+          <option value="Banco del Tesoro">Banco del Tesoro</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Nombre del Titular</label>
+        <input type="text" id="newAccTitular" class="form-input" placeholder="Ej. Roberto Gómez">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monto Compra Sugerido ($)</label>
+          <input type="number" id="newAccMonto" class="form-input" value="500" step="any">
+        </div>
+        <div class="form-group">
+          <label>Pago Acordado ($)</label>
+          <input type="number" id="newAccPago" class="form-input" value="5.00" step="any">
+        </div>
+      </div>
+      <button class="btn-save-op" onclick="guardarNuevaCuenta()">Crear Cuenta</button>
+    </div>
+  </div>
+
+  <!-- Barra de Navegación Inferior -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="btnNavInicio" onclick="switchTab('tab-inicio', 'btnNavInicio')">
+      <span class="nav-icon">⚡</span>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-btn" id="btnNavBancos" onclick="switchTab('tab-bancos', 'btnNavBancos')">
+      <span class="nav-icon">🏦</span>
+      <span>Bancos</span>
+    </button>
+    <button class="nav-btn" id="btnNavPagos" onclick="switchTab('tab-pagos', 'btnNavPagos')">
+      <span class="nav-icon">📋</span>
+      <span>Pagos Viernes</span>
+    </button>
+  </nav>
+
+  <script>
+    // Bancos predeterminados con sus montos sugeridos
+    const bancosConfig = [
+      { nombre: 'Banco de Venezuela', baseMonto: 500 },
+      { nombre: 'Banesco', baseMonto: 1000 },
+      { nombre: 'Mercantil', baseMonto: 1000 },
+      { nombre: 'Banco del Tesoro', baseMonto: 300 }
+    ];
+
+    // Cuentas con valores individuales editables
+    let cuentas = JSON.parse(localStorage.getItem('ax_cuentas_v2')) || [
+      { id: '1', banco: 'Banco de Venezuela', titular: 'Ana Pérez', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '2', banco: 'Banco de Venezuela', titular: 'Roberto C.', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '3', banco: 'Banco de Venezuela', titular: 'Cuenta 3', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '4', banco: 'Banco de Venezuela', titular: 'Cuenta 4', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '5', banco: 'Banco de Venezuela', titular: 'Cuenta 5', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '6', banco: 'Banco de Venezuela', titular: 'Cuenta 6', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '7', banco: 'Banesco', titular: 'Banesco Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '8', banco: 'Mercantil', titular: 'Mercantil Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
+      { id: '9', banco: 'Banco del Tesoro', titular: 'Tesoro Titular 1', montoComprado: 300, pagoTitular: 5.0, comprasSemana: [] }
+    ];
+
+    let opsHoy = JSON.parse(localStorage.getItem('ax_ops_hoy_v2')) || [];
+
+    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const diaActual = dias[new Date().getDay()] || 'Lun';
+    document.getElementById('currentDayTxt').textContent = `Día: ${diaActual}`;
+
+    function switchTab(tabId, btnId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById(btnId).classList.add('active');
+      if (tabId === 'tab-pagos') renderPagos();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      if (id === 'modalCalculadora') calcularOperacion();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // Lógica de Cálculo de Intervención
+    let resultadoCalc = {};
+
+    function calcularOperacion() {
+      const usdMeta = parseFloat(document.getElementById('calcUsdMeta').value) || 0;
+      const bcv = parseFloat(document.getElementById('calcTasaBCV').value) || 0;
+      const p2p = parseFloat(document.getElementById('calcTasaP2P').value) || 1;
+      const recargoInter = parseFloat(document.getElementById('calcTipoRecepcion').value) || 0;
+      const feeTarjeta = (parseFloat(document.getElementById('calcFeeTarjeta').value) || 0) / 100;
+      const feeBinance = (parseFloat(document.getElementById('calcFeeBinance').value) || 0) / 100;
+      const mula = parseFloat(document.getElementById('calcPagoMula').value) || 0;
+      const bot = parseFloat(document.getElementById('calcPagoBot').value) || 0;
+
+      // 1. Tasa Intervención Oficial (+0.50%)
+      const tasaIntervencion = bcv * 1.005;
+
+      // 2. Bolívares necesarios en cuenta (con opción interbancaria +0.30%)
+      let bsTotales = usdMeta * tasaIntervencion;
+      if (recargoInter > 0) {
+        bsTotales = bsTotales * (1 + recargoInter);
+      }
+
+      // 3. USDT que debes vender en Binance P2P
+      const usdtVender = bsTotales / p2p;
+
+      // 4. USDT retornados tras tarjeta y pasarela Binance
+      const usdPostTarjeta = usdMeta * (1 - feeTarjeta);
+      const usdtRetornados = usdPostTarjeta * (1 - feeBinance);
+
+      // 5. Gastos fijos (mula + bot)
+      const gastosTotales = mula + bot;
+      const usdtLimpios = usdtRetornados - gastosTotales;
+
+      // 6. Ganancia Neta
+      const ganancia = usdtLimpios - usdtVender;
+
+      // Render en el modal
+      document.getElementById('resBsTotales').textContent = bsTotales.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Bs';
+      document.getElementById('resUsdtVender').textContent = usdtVender.toFixed(2) + ' USDT';
+      document.getElementById('resUsdtNetos').textContent = usdtRetornados.toFixed(2) + ' USDT';
+      document.getElementById('resGastosFijos').textContent = '-$' + gastosTotales.toFixed(2) + ' USD';
+      
+      const txtGanancia = document.getElementById('resGananciaNeta');
+      txtGanancia.textContent = (ganancia >= 0 ? '+' : '') + ganancia.toFixed(2) + ' USDT';
+      txtGanancia.style.color = ganancia >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+      resultadoCalc = {
+        usdMeta,
+        usdtVender,
+        ganancia
+      };
+    }
+
+    function guardarOperacion() {
+      if (!resultadoCalc.usdtVender) calcularOperacion();
+
+      const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      opsHoy.unshift({
+        hora,
+        usd: resultadoCalc.usdMeta,
+        ganancia: resultadoCalc.ganancia
+      });
+
+      localStorage.setItem('ax_ops_hoy_v2', JSON.stringify(opsHoy));
+      closeModal('modalCalculadora');
+      renderInicio();
+    }
+
+    function renderInicio() {
+      let sumaGanancia = 0;
+      let sumaUsd = 0;
+      const cont = document.getElementById('listaOpsHoy');
+
+      if (opsHoy.length === 0) {
+        cont.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">Sin operaciones hoy</div>';
+      } else {
+        cont.innerHTML = '';
+        opsHoy.forEach(op => {
+          sumaGanancia += op.ganancia;
+          sumaUsd += op.usd;
+
+          const item = document.createElement('div');
+          item.style.cssText = 'background: #0b1320; border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;';
+          item.innerHTML = `
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 600;">Intervención $${op.usd} USD</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">${op.hora}</div>
+            </div>
+            <div style="color: var(--accent-green); font-weight: bold; font-size: 0.95rem;">+${op.ganancia.toFixed(2)} USDT</div>
+          `;
+          cont.appendChild(item);
+        });
+      }
+
+      document.getElementById('heroProfitHoy').innerHTML = `+${sumaGanancia.toFixed(2)} <span style="font-size: 1rem; color: var(--text-muted);">USDT</span>`;
+      document.getElementById('heroOpsHoy').textContent = `${opsHoy.length} ops`;
+      document.getElementById('heroUsdTotalHoy').textContent = `$${sumaUsd.toLocaleString()} USD`;
+    }
+
+    function limpiarHistorialHoy() {
+      if (confirm('¿Limpiar las compras registradas de hoy?')) {
+        opsHoy = [];
+        localStorage.setItem('ax_ops_hoy_v2', JSON.stringify(opsHoy));
+        renderInicio();
+      }
+    }
+
+    // Render de Bancos y Cuentas Editables
+    function renderBancos() {
+      const cont = document.getElementById('contenedorBancos');
+      cont.innerHTML = '';
+
+      bancosConfig.forEach(b => {
+        const cuentasBanco = cuentas.filter(c => c.banco === b.nombre);
+
+        const card = document.createElement('div');
+        card.className = 'bank-block';
+        card.innerHTML = `
+          <div class="bank-top">
+            <div>
+              <div style="font-weight: 700; font-size: 0.95rem;">${b.nombre}</div>
+              <div style="font-size: 0.75rem; color: var(--accent-blue);">Sugerido base: $${b.baseMonto} • ${cuentasBanco.length} cuentas</div>
+            </div>
+          </div>
+          <div id="list-${b.nombre.replace(/\s+/g, '')}"></div>
+        `;
+        cont.appendChild(card);
+
+        const listCont = card.querySelector(`#list-${b.nombre.replace(/\s+/g, '')}`);
+        if (cuentasBanco.length === 0) {
+          listCont.innerHTML = '<div style="padding: 12px 16px; font-size: 0.8rem; color: var(--
