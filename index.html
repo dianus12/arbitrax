@@ -28,7 +28,7 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      padding-bottom: 110px;
+      padding-bottom: 120px;
     }
 
     header {
@@ -114,7 +114,6 @@
       font-weight: 700;
     }
 
-    /* Pestaña 1 - Panel de Inicio */
     .hero-card {
       background: linear-gradient(145deg, #16243b, #0f1a2c);
       border: 1px solid var(--card-border);
@@ -152,19 +151,18 @@
       transform: scale(0.98);
     }
 
-    /* Modal Emergente de Arbitraje */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.85);
-      z-index: 100;
+      z-index: 999;
       align-items: flex-end;
       justify-content: center;
     }
 
     .modal.active {
-      display: flex;
+      display: flex !important;
     }
 
     .modal-content {
@@ -239,7 +237,6 @@
       cursor: pointer;
     }
 
-    /* Pestaña 2: Bancos y Cuentas Editables */
     .bank-block {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -324,6 +321,8 @@
       font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
+      border: none;
+      background: transparent;
     }
 
     .toggle-btn.yes.active {
@@ -336,7 +335,6 @@
       color: white;
     }
 
-    /* Pestaña 3: Pagos */
     .pay-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -347,7 +345,6 @@
       align-items: center;
     }
 
-    /* Barra Inferior */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -360,7 +357,7 @@
       grid-template-columns: 1fr 1fr 1fr;
       align-items: center;
       padding-bottom: env(safe-area-inset-bottom, 10px);
-      z-index: 90;
+      z-index: 100;
     }
 
     .nav-btn {
@@ -420,7 +417,7 @@
       </div>
 
       <!-- Botón que abre la Calculadora Emergente -->
-      <button class="btn-open-calc" onclick="openModal('modalCalculadora')">
+      <button type="button" class="btn-open-calc" id="btnAbrirCalculadora">
         <span style="font-size: 1.3rem;">⚡</span>
         Nueva Compra / Arbitraje
       </button>
@@ -429,7 +426,7 @@
       <div class="card">
         <div class="card-header">
           <h2>Operaciones Asentadas Hoy</h2>
-          <span style="font-size: 0.75rem; color: var(--text-muted);" onclick="limpiarHistorialHoy()">Limpiar</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer;" id="btnLimpiarHoy">Limpiar</span>
         </div>
         <div id="listaOpsHoy" style="display: flex; flex-direction: column; gap: 8px;">
           <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">Sin operaciones hoy</div>
@@ -441,12 +438,10 @@
     <div id="tab-bancos" class="tab-view">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span style="font-size: 0.85rem; color: var(--text-muted);">Control de compras y pagos diarios</span>
-        <button onclick="openModal('modalNuevaCuenta')" style="background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">+ Añadir Cuenta</button>
+        <button type="button" id="btnAbrirNuevaCuenta" style="background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">+ Añadir Cuenta</button>
       </div>
 
-      <div id="contenedorBancos">
-        <!-- Render dinámico de bancos con cuentas editables -->
-      </div>
+      <div id="contenedorBancos"></div>
     </div>
 
     <!-- ==================== PESTAÑA 3: PAGOS VIERNES ==================== -->
@@ -469,11 +464,9 @@
           <h2>Desglose por Titular</h2>
           <span style="font-size: 0.75rem; color: var(--accent-blue);">Lunes a Viernes</span>
         </div>
-        <div id="listaTitularesPagos" style="display: flex; flex-direction: column; gap: 10px;">
-          <!-- Render liquidación de cada persona -->
-        </div>
+        <div id="listaTitularesPagos" style="display: flex; flex-direction: column; gap: 10px;"></div>
 
-        <button onclick="cerrarSemana()" style="width: 100%; padding: 14px; background: #059669; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 0.95rem; margin-top: 15px; cursor: pointer;">
+        <button type="button" id="btnCerrarSemana" style="width: 100%; padding: 14px; background: #059669; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 0.95rem; margin-top: 15px; cursor: pointer;">
           ✅ Liquidar y Cerrar Semana (Viernes)
         </button>
       </div>
@@ -486,28 +479,28 @@
     <div class="modal-content">
       <div class="card-header">
         <h2>⚡ Arbitraje / Intervención</h2>
-        <span onclick="closeModal('modalCalculadora')" style="cursor: pointer; font-size: 1.6rem; color: var(--text-muted);">&times;</span>
+        <span id="btnCerrarCalculadora" style="cursor: pointer; font-size: 1.6rem; color: var(--text-muted);">&times;</span>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Monto USD a Comprar en Banco</label>
-          <input type="number" id="calcUsdMeta" class="form-input" value="500" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcUsdMeta" class="form-input" value="500" step="any">
         </div>
         <div class="form-group">
           <label>Tasa BCV Oficial (Bs/USD)</label>
-          <input type="number" id="calcTasaBCV" class="form-input" value="881.06" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcTasaBCV" class="form-input" value="881.06" step="any">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Tasa Venta P2P Binance (Bs/USDT)</label>
-          <input type="number" id="calcTasaP2P" class="form-input" value="1010.00" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcTasaP2P" class="form-input" value="1010.00" step="any">
         </div>
         <div class="form-group">
           <label>Recepción de Bolívares</label>
-          <select id="calcTipoRecepcion" class="form-select" onchange="calcularOperacion()">
+          <select id="calcTipoRecepcion" class="form-select">
             <option value="0">Mismo Banco (0%)</option>
             <option value="0.003">Otro Banco (+0.30% Interbancario)</option>
           </select>
@@ -517,22 +510,22 @@
       <div class="form-row">
         <div class="form-group">
           <label>Fee Pasarela Binance (%)</label>
-          <input type="number" id="calcFeeBinance" class="form-input" value="4.10" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcFeeBinance" class="form-input" value="4.10" step="any">
         </div>
         <div class="form-group">
           <label>Fee Tarjeta Int. (%)</label>
-          <input type="number" id="calcFeeTarjeta" class="form-input" value="2.45" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcFeeTarjeta" class="form-input" value="2.45" step="any">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Pago Titular / Mula (USD)</label>
-          <input type="number" id="calcPagoMula" class="form-input" value="5.00" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcPagoMula" class="form-input" value="5.00" step="any">
         </div>
         <div class="form-group">
           <label>Pago Bot / Sistema (USD)</label>
-          <input type="number" id="calcPagoBot" class="form-input" value="5.00" step="any" oninput="calcularOperacion()">
+          <input type="number" id="calcPagoBot" class="form-input" value="5.00" step="any">
         </div>
       </div>
 
@@ -560,7 +553,7 @@
         </div>
       </div>
 
-      <button class="btn-save-op" onclick="guardarOperacion()">Guardar y Asentar Operación</button>
+      <button type="button" class="btn-save-op" id="btnGuardarOperacion">Guardar y Asentar Operación</button>
     </div>
   </div>
 
@@ -569,7 +562,7 @@
     <div class="modal-content">
       <div class="card-header">
         <h2>Añadir Cuenta</h2>
-        <span onclick="closeModal('modalNuevaCuenta')" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+        <span id="btnCerrarNuevaCuenta" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
       </div>
       <div class="form-group" style="margin-bottom: 12px;">
         <label>Banco</label>
@@ -594,28 +587,28 @@
           <input type="number" id="newAccPago" class="form-input" value="5.00" step="any">
         </div>
       </div>
-      <button class="btn-save-op" onclick="guardarNuevaCuenta()">Crear Cuenta</button>
+      <button type="button" class="btn-save-op" id="btnGuardarNuevaCuenta">Crear Cuenta</button>
     </div>
   </div>
 
   <!-- Barra de Navegación Inferior -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" id="btnNavInicio" onclick="switchTab('tab-inicio', 'btnNavInicio')">
+    <button type="button" class="nav-btn active" id="btnNavInicio">
       <span class="nav-icon">⚡</span>
       <span>Inicio</span>
     </button>
-    <button class="nav-btn" id="btnNavBancos" onclick="switchTab('tab-bancos', 'btnNavBancos')">
+    <button type="button" class="nav-btn" id="btnNavBancos">
       <span class="nav-icon">🏦</span>
       <span>Bancos</span>
     </button>
-    <button class="nav-btn" id="btnNavPagos" onclick="switchTab('tab-pagos', 'btnNavPagos')">
+    <button type="button" class="nav-btn" id="btnNavPagos">
       <span class="nav-icon">📋</span>
       <span>Pagos Viernes</span>
     </button>
   </nav>
 
   <script>
-    // Bancos predeterminados con sus montos sugeridos
+    // Configuración Bancos
     const bancosConfig = [
       { nombre: 'Banco de Venezuela', baseMonto: 500 },
       { nombre: 'Banesco', baseMonto: 1000 },
@@ -623,170 +616,38 @@
       { nombre: 'Banco del Tesoro', baseMonto: 300 }
     ];
 
-    // Cuentas con valores individuales editables
-    let cuentas = JSON.parse(localStorage.getItem('ax_cuentas_v2')) || [
-      { id: '1', banco: 'Banco de Venezuela', titular: 'Ana Pérez', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '2', banco: 'Banco de Venezuela', titular: 'Roberto C.', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '3', banco: 'Banco de Venezuela', titular: 'Cuenta 3', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '4', banco: 'Banco de Venezuela', titular: 'Cuenta 4', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '5', banco: 'Banco de Venezuela', titular: 'Cuenta 5', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '6', banco: 'Banco de Venezuela', titular: 'Cuenta 6', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '7', banco: 'Banesco', titular: 'Banesco Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '8', banco: 'Mercantil', titular: 'Mercantil Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
-      { id: '9', banco: 'Banco del Tesoro', titular: 'Tesoro Titular 1', montoComprado: 300, pagoTitular: 5.0, comprasSemana: [] }
-    ];
+    let cuentas = [];
+    try {
+      cuentas = JSON.parse(localStorage.getItem('ax_cuentas_v3')) || [];
+    } catch(e) { cuentas = []; }
 
-    let opsHoy = JSON.parse(localStorage.getItem('ax_ops_hoy_v2')) || [];
+    if (cuentas.length === 0) {
+      cuentas = [
+        { id: '1', banco: 'Banco de Venezuela', titular: 'Ana Pérez', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '2', banco: 'Banco de Venezuela', titular: 'Roberto C.', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '3', banco: 'Banco de Venezuela', titular: 'Cuenta 3', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '4', banco: 'Banco de Venezuela', titular: 'Cuenta 4', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '5', banco: 'Banco de Venezuela', titular: 'Cuenta 5', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '6', banco: 'Banco de Venezuela', titular: 'Cuenta 6', montoComprado: 500, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '7', banco: 'Banesco', titular: 'Banesco Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '8', banco: 'Mercantil', titular: 'Mercantil Titular 1', montoComprado: 1000, pagoTitular: 5.0, comprasSemana: [] },
+        { id: '9', banco: 'Banco del Tesoro', titular: 'Tesoro Titular 1', montoComprado: 300, pagoTitular: 5.0, comprasSemana: [] }
+      ];
+    }
+
+    let opsHoy = [];
+    try {
+      opsHoy = JSON.parse(localStorage.getItem('ax_ops_hoy_v3')) || [];
+    } catch(e) { opsHoy = []; }
 
     const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     const diaActual = dias[new Date().getDay()] || 'Lun';
     document.getElementById('currentDayTxt').textContent = `Día: ${diaActual}`;
 
+    // Cambio de pestañas
     function switchTab(tabId, btnId) {
       document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       document.getElementById(btnId).classList.add('active');
-      if (tabId === 'tab-pagos') renderPagos();
-    }
-
-    function openModal(id) {
-      document.getElementById(id).classList.add('active');
-      if (id === 'modalCalculadora') calcularOperacion();
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-
-    // Lógica de Cálculo de Intervención
-    let resultadoCalc = {};
-
-    function calcularOperacion() {
-      const usdMeta = parseFloat(document.getElementById('calcUsdMeta').value) || 0;
-      const bcv = parseFloat(document.getElementById('calcTasaBCV').value) || 0;
-      const p2p = parseFloat(document.getElementById('calcTasaP2P').value) || 1;
-      const recargoInter = parseFloat(document.getElementById('calcTipoRecepcion').value) || 0;
-      const feeTarjeta = (parseFloat(document.getElementById('calcFeeTarjeta').value) || 0) / 100;
-      const feeBinance = (parseFloat(document.getElementById('calcFeeBinance').value) || 0) / 100;
-      const mula = parseFloat(document.getElementById('calcPagoMula').value) || 0;
-      const bot = parseFloat(document.getElementById('calcPagoBot').value) || 0;
-
-      // 1. Tasa Intervención Oficial (+0.50%)
-      const tasaIntervencion = bcv * 1.005;
-
-      // 2. Bolívares necesarios en cuenta (con opción interbancaria +0.30%)
-      let bsTotales = usdMeta * tasaIntervencion;
-      if (recargoInter > 0) {
-        bsTotales = bsTotales * (1 + recargoInter);
-      }
-
-      // 3. USDT que debes vender en Binance P2P
-      const usdtVender = bsTotales / p2p;
-
-      // 4. USDT retornados tras tarjeta y pasarela Binance
-      const usdPostTarjeta = usdMeta * (1 - feeTarjeta);
-      const usdtRetornados = usdPostTarjeta * (1 - feeBinance);
-
-      // 5. Gastos fijos (mula + bot)
-      const gastosTotales = mula + bot;
-      const usdtLimpios = usdtRetornados - gastosTotales;
-
-      // 6. Ganancia Neta
-      const ganancia = usdtLimpios - usdtVender;
-
-      // Render en el modal
-      document.getElementById('resBsTotales').textContent = bsTotales.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Bs';
-      document.getElementById('resUsdtVender').textContent = usdtVender.toFixed(2) + ' USDT';
-      document.getElementById('resUsdtNetos').textContent = usdtRetornados.toFixed(2) + ' USDT';
-      document.getElementById('resGastosFijos').textContent = '-$' + gastosTotales.toFixed(2) + ' USD';
-      
-      const txtGanancia = document.getElementById('resGananciaNeta');
-      txtGanancia.textContent = (ganancia >= 0 ? '+' : '') + ganancia.toFixed(2) + ' USDT';
-      txtGanancia.style.color = ganancia >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-
-      resultadoCalc = {
-        usdMeta,
-        usdtVender,
-        ganancia
-      };
-    }
-
-    function guardarOperacion() {
-      if (!resultadoCalc.usdtVender) calcularOperacion();
-
-      const hora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      opsHoy.unshift({
-        hora,
-        usd: resultadoCalc.usdMeta,
-        ganancia: resultadoCalc.ganancia
-      });
-
-      localStorage.setItem('ax_ops_hoy_v2', JSON.stringify(opsHoy));
-      closeModal('modalCalculadora');
-      renderInicio();
-    }
-
-    function renderInicio() {
-      let sumaGanancia = 0;
-      let sumaUsd = 0;
-      const cont = document.getElementById('listaOpsHoy');
-
-      if (opsHoy.length === 0) {
-        cont.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">Sin operaciones hoy</div>';
-      } else {
-        cont.innerHTML = '';
-        opsHoy.forEach(op => {
-          sumaGanancia += op.ganancia;
-          sumaUsd += op.usd;
-
-          const item = document.createElement('div');
-          item.style.cssText = 'background: #0b1320; border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;';
-          item.innerHTML = `
-            <div>
-              <div style="font-size: 0.85rem; font-weight: 600;">Intervención $${op.usd} USD</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted);">${op.hora}</div>
-            </div>
-            <div style="color: var(--accent-green); font-weight: bold; font-size: 0.95rem;">+${op.ganancia.toFixed(2)} USDT</div>
-          `;
-          cont.appendChild(item);
-        });
-      }
-
-      document.getElementById('heroProfitHoy').innerHTML = `+${sumaGanancia.toFixed(2)} <span style="font-size: 1rem; color: var(--text-muted);">USDT</span>`;
-      document.getElementById('heroOpsHoy').textContent = `${opsHoy.length} ops`;
-      document.getElementById('heroUsdTotalHoy').textContent = `$${sumaUsd.toLocaleString()} USD`;
-    }
-
-    function limpiarHistorialHoy() {
-      if (confirm('¿Limpiar las compras registradas de hoy?')) {
-        opsHoy = [];
-        localStorage.setItem('ax_ops_hoy_v2', JSON.stringify(opsHoy));
-        renderInicio();
-      }
-    }
-
-    // Render de Bancos y Cuentas Editables
-    function renderBancos() {
-      const cont = document.getElementById('contenedorBancos');
-      cont.innerHTML = '';
-
-      bancosConfig.forEach(b => {
-        const cuentasBanco = cuentas.filter(c => c.banco === b.nombre);
-
-        const card = document.createElement('div');
-        card.className = 'bank-block';
-        card.innerHTML = `
-          <div class="bank-top">
-            <div>
-              <div style="font-weight: 700; font-size: 0.95rem;">${b.nombre}</div>
-              <div style="font-size: 0.75rem; color: var(--accent-blue);">Sugerido base: $${b.baseMonto} • ${cuentasBanco.length} cuentas</div>
-            </div>
-          </div>
-          <div id="list-${b.nombre.replace(/\s+/g, '')}"></div>
-        `;
-        cont.appendChild(card);
-
-        const listCont = card.querySelector(`#list-${b.nombre.replace(/\s+/g, '')}`);
-        if (cuentasBanco.length === 0) {
-          listCont.innerHTML = '<div style="padding: 12px 16px; font-size: 0.8rem; color: var(--
+      if (tabId 
